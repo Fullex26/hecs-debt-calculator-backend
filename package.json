@@ -1,21 +1,25 @@
 {
   "name": "hecs-debt-calculator-backend",
   "version": "1.0.0",
+  "description": "A HECS Debt Calculator application",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "dev": "nodemon index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "engines": {
+    "node": "16.x"
+  },
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1",
-    "mongodb": "^6.10.0",
-    "mongoose": "^8.8.1"
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2",
+    "mongoose": "^6.0.0",
+    "cors": "^2.8.5"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
-  }
+    "nodemon": "^2.0.15"
+  },
+  "keywords": [],
+  "author": "Jordan Fuller",
+  "license": "MIT"
 }
