@@ -1,6 +1,5 @@
 // index.js
 require('dotenv').config(); // To use environment variables
-console.log('MONGODB_URI:', process.env.MONGODB_URI);
 
 const express = require('express');
 const path = require('path');
@@ -12,6 +11,9 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON bodies
 app.use(express.json());
+
+// Suppress strictQuery deprecation warning
+mongoose.set('strictQuery', false);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
