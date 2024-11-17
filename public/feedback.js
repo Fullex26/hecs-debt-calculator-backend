@@ -2,7 +2,7 @@ function initializeFeedbackForm() {
   const feedbackButton = document.createElement('button');
   feedbackButton.className = 'feedback-button';
   feedbackButton.innerHTML = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
     </svg>
     <span>Feedback</span>
@@ -10,10 +10,13 @@ function initializeFeedbackForm() {
 
   const feedbackModal = document.createElement('div');
   feedbackModal.className = 'feedback-modal';
-  feedbackModal.hidden = true;
   feedbackModal.innerHTML = `
     <div class="feedback-modal-content">
-      <button class="close-button">&times;</button>
+      <button class="close-button" aria-label="Close feedback form">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"></path>
+        </svg>
+      </button>
       <h2>Send Feedback</h2>
       <form id="feedback-form">
         <div class="form-group">
@@ -45,19 +48,45 @@ function initializeFeedbackForm() {
   document.body.appendChild(feedbackButton);
   document.body.appendChild(feedbackModal);
 
+  // Show modal
+  const showModal = () => {
+    feedbackModal.classList.add('visible');
+    document.body.style.overflow = 'hidden'; // Prevent scrolling
+  };
+
+  // Hide modal
+  const hideModal = () => {
+    feedbackModal.classList.remove('visible');
+    document.body.style.overflow = ''; // Restore scrolling
+  };
+
   // Event handlers
-  feedbackButton.addEventListener('click', () => {
-    feedbackModal.hidden = false;
-  });
+  feedbackButton.addEventListener('click', showModal);
 
   const closeButton = feedbackModal.querySelector('.close-button');
-  closeButton.addEventListener('click', () => {
-    feedbackModal.hidden = true;
+  closeButton.addEventListener('click', hideModal);
+
+  // Close modal when clicking outside
+  feedbackModal.addEventListener('click', (e) => {
+    if (e.target === feedbackModal) {
+      hideModal();
+    }
+  });
+
+  // Handle escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && feedbackModal.classList.contains('visible')) {
+      hideModal();
+    }
   });
 
   const form = feedbackModal.querySelector('#feedback-form');
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    const submitButton = form.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    submitButton.textContent = 'Submitting...';
     
     const formData = {
       type: form.type.value,
@@ -81,10 +110,13 @@ function initializeFeedbackForm() {
 
       alert('Thank you for your feedback!');
       form.reset();
-      feedbackModal.hidden = true;
+      hideModal();
     } catch (error) {
       console.error('Error submitting feedback:', error);
       alert('Failed to submit feedback. Please try again.');
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Submit Feedback';
     }
   });
 }
