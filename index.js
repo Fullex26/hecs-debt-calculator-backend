@@ -49,8 +49,10 @@ const REPAYMENT_BANDS = [
 const scriptSrcUrls = [
   "'self'",
   "'unsafe-inline'",
+  "'unsafe-eval'",
   "https://cdn.jsdelivr.net/",
-  "https://paycalculator.com.au"
+  "https://calculatorsonline.com.au",
+  "//calculatorsonline.com.au"
 ];
 
 // Define allowed style sources
@@ -70,12 +72,13 @@ const fontSrcUrls = [
 const connectSrcUrls = [
   "'self'",
   "https://calculatorsonline.com.au",
+  "//calculatorsonline.com.au"
 ];
 
 // Define allowed frame sources
 const frameSrcUrls = [
   "'self'",
-  "https://paycalculator.com.au"
+  "https://calculatorsonline.com.au"
 ];
 
 // Configure Helmet's CSP
@@ -87,7 +90,7 @@ app.use(
       styleSrc: styleSrcUrls,
       connectSrc: connectSrcUrls,
       fontSrc: fontSrcUrls,
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", "data:", "https:", "https://calculatorsonline.com.au"],
       frameSrc: frameSrcUrls
     },
   })
@@ -246,6 +249,42 @@ app.post('/api/tax-calculation', [
   } catch (error) {
     console.error('Error saving tax calculation:', error);
     res.status(500).json({ error: 'Failed to save tax calculation' });
+  }
+});
+
+/**
+ * @route   POST /api/hecs/calculate
+ * @desc    Calculate HECS debt repayment schedule and save user data
+ * @access  Public
+ */
+app.post('/api/hecs/calculate', [
+  body('debt').isFloat({ min: 0 }).withMessage('Debt must be a positive number'),
+  body('income').isFloat({ min: 0 }).withMessage('Income must be a positive number'),
+  body('growth').isFloat({ min: 0, max: 100 }).withMessage('Growth rate must be between 0 and 100')
+], async (req, res) => {
+  try {
+    // Validate request
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ error: errors.array()[0].msg });
+    }
+
+    const { debt, income, growth } = req.body;
+    console.log('Received calculation request:', { debt, income, growth });
+
+    // Calculate repayment schedule
+    const repaymentSchedule = calculateRepaymentSchedule(debt, income, growth);
+    const yearsToRepay = repaymentSchedule.length;
+
+    console.log('Calculation completed:', { yearsToRepay });
+
+    res.json({
+      yearsToRepay,
+      repaymentSchedule
+    });
+  } catch (error) {
+    console.error('Calculation error:', error);
+    res.status(500).json({ error: 'Failed to process calculation' });
   }
 });
 

@@ -29,22 +29,19 @@
       <h1>Tax Calculator</h1>
       <p class="subtitle">Calculate your tax and Medicare levy</p>
       
-      <!-- Replace with direct calculator embed -->
-      <div class="calculator-wrapper">
-        <iframe 
-          src="https://paycalculator.com.au/tax-calculator" 
-          width="100%" 
-          height="800" 
-          frameborder="0"
-          title="Tax Calculator"
-          loading="lazy"
-          allowfullscreen
-        ></iframe>
+      <!-- Tax Calculator Widget -->
+      <div id="atataxcalculator" class="atataxcalculator-light">
+        <div class="atataxcalculator-options atataxcalculator-show-up"></div>
+        <div class="atataxcalculator-table atataxcalculator-show-up"></div>
+        <div class="atataxcalculator-anchors atataxcalculator-show-up">
+          <p>Tax Calculator from <a href="https://calculatorsonline.com.au">calculatorsonline.com.au</a></p>
+        </div>
       </div>
+      <script type="text/javascript" src="//calculatorsonline.com.au/external/!main/widget.min.js"></script>
 
-      <!-- Add fallback message -->
+      <!-- Fallback message -->
       <div id="tax-fallback" class="error-message" hidden>
-        Unable to load the Tax Calculator. Please visit <a href="https://paycalculator.com.au/tax-calculator" target="_blank" rel="noopener">PayCalculator.com.au</a> directly.
+        Unable to load the Tax Calculator. Please visit <a href="https://calculatorsonline.com.au" target="_blank" rel="noopener">calculatorsonline.com.au</a> directly.
       </div>
     </div>
   </main>
