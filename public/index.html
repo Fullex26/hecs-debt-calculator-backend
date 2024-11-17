@@ -2,116 +2,48 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HECS Debt Calculator</title>
+  
+  <!-- Add Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
-
-  <!-- Font Awesome CDN -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
-
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
-<body data-page="hecs-calculator">
-  <div class="container">
-    <header>
-      <nav class="navbar" aria-label="Main Navigation">
-        <ul>
-          <li><a href="index.html" class="active">HECS Debt Calculator</a></li>
-          <li><a href="tax.html">Tax Calculator</a></li>
-        </ul>
-      </nav>
-      <i class="fas fa-dollar-sign header-icon" aria-hidden="true"></i>
-      <h1>HECS Debt Calculator</h1>
-      <p>Understand your HECS debt and plan your repayment journey.</p>
-    </header>
-
-    <main>
-      <form id="hecs-form">
-        <div class="form-group">
-          <label for="debt">
-            <i class="fas fa-piggy-bank"></i> HECS Debt Amount ($):
-            <span class="tooltip" title="Enter the total amount of your HECS debt">ℹ️</span>
-          </label>
-          <input
-            type="number"
-            id="debt"
-            name="debt"
-            placeholder="Enter your HECS debt"
-            required
-            aria-label="HECS Debt Amount"
-            aria-describedby="debt-help"
-            min="0"
-            step="0.01"
-          >
-          <small id="debt-help" class="help-text">Please enter the amount of your HECS debt in Australian dollars.</small>
-        </div>
-
-        <div class="form-group">
-          <label for="income">
-            <i class="fas fa-wallet"></i> Current Annual Income ($):
-            <span class="tooltip" title="Enter your current annual income">ℹ️</span>
-          </label>
-          <input
-            type="number"
-            id="income"
-            name="income"
-            placeholder="Enter your annual income"
-            required
-            aria-label="Current Annual Income"
-            aria-describedby="income-help"
-            min="0"
-            step="0.01"
-          >
-          <small id="income-help" class="help-text">Enter your current annual income before taxes and after superannuation.</small>
-        </div>
-
-        <div class="form-group">
-          <label for="growth">
-            <i class="fas fa-chart-line"></i> Expected Income Growth (% per year):
-            <span class="tooltip" title="Enter your expected annual income growth rate">ℹ️</span>
-          </label>
-          <input
-            type="number"
-            id="growth"
-            name="growth"
-            placeholder="Enter expected growth rate"
-            step="0.1"
-            required
-            aria-label="Expected Income Growth"
-            aria-describedby="growth-help"
-            min="0"
-            max="100"
-          >
-          <small id="growth-help" class="help-text">Estimate your expected annual income growth percentage.</small>
-        </div>
-
-        <button type="submit">Calculate</button>
-      </form>
-
-      <div id="analysis" class="analysis">
-        <!-- Spinner -->
-        <div class="spinner" id="spinner" aria-label="Loading" role="status" hidden>
-          <div class="double-bounce1"></div>
-          <div class="double-bounce2"></div>
-        </div>
-        <!-- Analysis results (message, table, and chart) will appear here -->
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <img src="logo.svg" alt="HECS Calculator Logo" height="40">
       </div>
-    </main>
+      <ul>
+        <li><a href="index.html" class="active">HECS Calculator</a></li>
+        <li><a href="tax.html">Tax Calculator</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <footer>
-      <p>&copy; 2024 HECS Debt Calculator. All rights reserved.</p>
-    </footer>
-  </div>
+  <main class="container">
+    <div class="calculator-card">
+      <h1>HECS Debt Calculator</h1>
+      <p class="subtitle">Plan your student debt repayment journey with confidence</p>
+      
+      <form id="hecs-form">
+        <!-- Form groups with enhanced styling -->
+      </form>
+    </div>
 
-  <!-- Include external JavaScript files -->
-  <script src="script.js"></script>
+    <div id="analysis" class="results-container" style="display: none;">
+      <!-- Results will be dynamically inserted here -->
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; 2024 HECS Calculator. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 </html>

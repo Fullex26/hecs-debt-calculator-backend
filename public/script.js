@@ -123,48 +123,33 @@ function initializeHecsDebtCalculator() {
    * @param {Array} repaymentSchedule - The repayment schedule data.
    */
   function displayResults(yearsToRepay, repaymentSchedule) {
-    console.log('Displaying results:', { yearsToRepay, repaymentSchedule }); // Debug log
-    
+    console.log('Starting displayResults with:', { yearsToRepay, repaymentSchedule });
     const analysisDiv = document.getElementById('analysis');
     
-    // Clear previous results
-    analysisDiv.innerHTML = '';
-    
-    // Calculate initial debt from first repayment entry
-    const initialDebt = repaymentSchedule[0].remainingDebt + repaymentSchedule[0].repayment;
-    const totalRepaid = repaymentSchedule[repaymentSchedule.length - 1].totalRepayment;
-    const initialIncome = repaymentSchedule[0].income;
-    const finalIncome = repaymentSchedule[repaymentSchedule.length - 1].income;
-    
-    // Create results HTML
+    // Create the results HTML
     const resultsHTML = `
       <div class="results-container">
         <div class="results-summary">
           <h2>Repayment Analysis</h2>
           <p class="results-message">
             Based on your inputs, it will take approximately 
-            <strong>${yearsToRepay} years</strong> to repay your HECS debt of 
-            <strong>${formatCurrency(initialDebt)}</strong>.
+            <strong>${yearsToRepay} years</strong> to repay your HECS debt.
           </p>
         </div>
         
         ${generateRepaymentTable(repaymentSchedule)}
         
-        <div class="chart-container">
-          <canvas id="repaymentChart"></canvas>
+        <div class="chart-wrapper">
+          <canvas id="repaymentChart" width="400" height="200"></canvas>
         </div>
       </div>
     `;
     
-    // Update the analysis div
+    // Update the DOM
     analysisDiv.innerHTML = resultsHTML;
-    analysisDiv.classList.add('show');
     
-    // Render the chart after a short delay to ensure canvas is ready
-    setTimeout(() => {
-      const ctx = document.getElementById('repaymentChart').getContext('2d');
-      renderChart(ctx, repaymentSchedule);
-    }, 100);
+    // Create the chart
+    createChart(repaymentSchedule);
   }
 
   /**
@@ -233,36 +218,48 @@ function initializeHecsDebtCalculator() {
    * Renders the repayment chart using Chart.js.
    * @param {Array} schedule - The repayment schedule data.
    */
-  function renderChart(ctx, schedule) {
-    console.log('Rendering chart with data:', schedule); // Debug log
+  function createChart(schedule) {
+    console.log('Creating chart with schedule:', schedule);
+    const canvas = document.getElementById('repaymentChart');
     
-    // Destroy existing chart if it exists
-    if (window.repaymentChart) {
-      window.repaymentChart.destroy();
+    if (!canvas) {
+      console.error('Canvas element not found');
+      return;
     }
+
+    const ctx = canvas.getContext('2d');
     
+    // Prepare the data
     const labels = schedule.map(entry => `Year ${entry.year}`);
-    const repaymentData = schedule.map(entry => entry.totalRepayment);
+    const debtData = schedule.map(entry => entry.remainingDebt);
     const incomeData = schedule.map(entry => entry.income);
     
-    window.repaymentChart = new Chart(ctx, {
+    // Destroy existing chart if it exists
+    if (window.myChart) {
+      window.myChart.destroy();
+    }
+    
+    // Create new chart
+    window.myChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: labels,
         datasets: [
           {
-            label: 'Total Repayment',
-            data: repaymentData,
-            borderColor: '#2980b9',
-            backgroundColor: 'rgba(41, 128, 185, 0.2)',
-            fill: true
+            label: 'Remaining Debt',
+            data: debtData,
+            borderColor: '#e74c3c',
+            backgroundColor: 'rgba(231, 76, 60, 0.1)',
+            fill: true,
+            tension: 0.4
           },
           {
-            label: 'Income',
+            label: 'Annual Income',
             data: incomeData,
-            borderColor: '#27ae60',
-            backgroundColor: 'rgba(39, 174, 96, 0.2)',
-            fill: true
+            borderColor: '#2ecc71',
+            backgroundColor: 'rgba(46, 204, 113, 0.1)',
+            fill: true,
+            tension: 0.4
           }
         ]
       },
@@ -270,9 +267,31 @@ function initializeHecsDebtCalculator() {
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
+          legend: {
+            position: 'top',
+          },
           title: {
             display: true,
-            text: 'Repayment Progress and Income Growth'
+            text: 'HECS Debt Repayment Progress'
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) {
+                  label += ': ';
+                }
+                if (context.parsed.y !== null) {
+                  label += new Intl.NumberFormat('en-AU', {
+                    style: 'currency',
+                    currency: 'AUD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                  }).format(context.parsed.y);
+                }
+                return label;
+              }
+            }
           }
         },
         scales: {
@@ -280,7 +299,12 @@ function initializeHecsDebtCalculator() {
             beginAtZero: true,
             ticks: {
               callback: function(value) {
-                return formatCurrency(value);
+                return new Intl.NumberFormat('en-AU', {
+                  style: 'currency',
+                  currency: 'AUD',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                }).format(value);
               }
             }
           }
