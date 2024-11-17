@@ -2,66 +2,65 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tax Calculator - HECS Debt Calculator</title>
-  <link rel="stylesheet" href="styles.css">
   
-  <!-- Font Awesome CDN -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-    crossorigin="anonymous"
-    referrerpolicy="no-referrer"
-  />
+  <!-- Add Inter font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body data-page="tax-calculator">
-  <div class="container">
-    <header>
-      <nav class="navbar" aria-label="Main Navigation">
-        <ul>
-          <li><a href="index.html">HECS Debt Calculator</a></li>
-          <li><a href="tax.html" class="active">Tax Calculator</a></li>
-        </ul>
-      </nav>
-      <i class="fas fa-calculator header-icon" aria-hidden="true"></i>
-      <h1>Tax Calculator</h1>
-      <p>Calculate your annual tax obligations with ease.</p>
-    </header>
+  <header>
+    <nav class="navbar">
+      <div class="logo">
+        <h1 class="logo-text">HECS<span>Calculator</span></h1>
+      </div>
+      <ul>
+        <li><a href="index.html">HECS Calculator</a></li>
+        <li><a href="tax.html" class="active">Tax Calculator</a></li>
+      </ul>
+    </nav>
+  </header>
 
-    <main>
+  <main class="container">
+    <div class="calculator-card">
+      <h1>Tax Calculator</h1>
+      <p class="subtitle">Calculate your annual tax obligations with ease</p>
+
       <!-- Embedded Tax Calculator -->
-      <div id="atataxcalculator" class="atataxcalculator-light">
+      <div id="atataxcalculator" class="atataxcalculator-light calculator-wrapper">
         <div class="atataxcalculator-options atataxcalculator-show-up"></div>
         <div class="atataxcalculator-table atataxcalculator-show-up"></div>
         <div class="atataxcalculator-anchors atataxcalculator-show-up">
-          <p>Tax Calculator from <a href="https://calculatorsonline.com.au" target="_blank" rel="noopener noreferrer">calculatorsonline.com.au</a></p>
+          <p class="attribution">Tax Calculator from <a href="https://calculatorsonline.com.au" target="_blank" rel="noopener noreferrer">calculatorsonline.com.au</a></p>
         </div>
       </div>
       
       <!-- Loading Spinner -->
-      <div id="tax-spinner" class="spinner" aria-label="Loading Tax Calculator" role="status" hidden>
-        <div class="double-bounce1"></div>
-        <div class="double-bounce2"></div>
+      <div id="tax-spinner" class="spinner-container" aria-label="Loading Tax Calculator" role="status" hidden>
+        <div class="spinner"></div>
       </div>
 
       <!-- Fallback Message -->
       <div id="tax-fallback" class="error-message" hidden>
         Unable to load the Tax Calculator at this time. Please try again later.
       </div>
-      
-      <!-- External Script to Handle Widget Loading -->
-      <script type="text/javascript" src="https://calculatorsonline.com.au/external/!main/widget.min.js" defer></script>
-      <script src="/tax-widget-handler.js"></script>
-    </main>
+    </div>
+  </main>
 
-    <footer>
-      <p>&copy; 2024 HECS Debt Calculator. All rights reserved.</p>
-    </footer>
-  </div>
+  <footer>
+    <div class="container">
+      <div class="footer-links">
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+      <p>&copy; 2024 HECS Calculator. All rights reserved.</p>
+    </div>
+  </footer>
 
-  <!-- Include script.js only if necessary -->
-  <!-- <script src="script.js"></script> -->
   <script src="/tax-calculator.js"></script>
+  <script src="/tax-widget-handler.js"></script>
 </body>
 </html>

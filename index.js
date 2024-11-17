@@ -58,15 +58,19 @@ const scriptSrcUrls = [
 // Define allowed style sources
 const styleSrcUrls = [
   "'self'",
-  'https://cdnjs.cloudflare.com',
-  'https://calculatorsonline.com.au',
+  "'unsafe-inline'",
+  "https://fonts.googleapis.com",
+  "https://fonts.gstatic.com",
+  "https://cdnjs.cloudflare.com",
+  "https://calculatorsonline.com.au"
 ];
 
 // Define allowed font sources
 const fontSrcUrls = [
   "'self'",
-  'https://cdnjs.cloudflare.com',
-  'https://calculatorsonline.com.au',
+  "https://fonts.gstatic.com",
+  "https://fonts.googleapis.com",
+  "data:"
 ];
 
 // Configure Helmet's CSP
@@ -75,19 +79,11 @@ app.use(
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: scriptSrcUrls,
-      styleSrc: [...styleSrcUrls, "'unsafe-inline'"],
-      fontSrc: [
-        ...fontSrcUrls,
-        'https://calculatorsonline.com.au'
-      ],
-      imgSrc: ["'self'", 'data:', 'https://calculatorsonline.com.au'],
-      connectSrc: ["'self'", 'https://calculatorsonline.com.au'],
+      styleSrc: styleSrcUrls,
+      fontSrc: fontSrcUrls,
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'", "https://calculatorsonline.com.au"],
       objectSrc: ["'none'"],
-      styleSrc: [
-        ...styleSrcUrls,
-        "'unsafe-inline'",
-        'https://calculatorsonline.com.au'
-      ],
     },
   })
 );
