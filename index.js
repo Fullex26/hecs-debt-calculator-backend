@@ -52,7 +52,6 @@ const scriptSrcUrls = [
   "'unsafe-eval'",
   "https://cdn.jsdelivr.net",
   "https://calculatorsonline.com.au",
-  "http://calculatorsonline.com.au",
   "https://ajax.googleapis.com",
   "https://*.googleapis.com",
   "https://code.jquery.com"
@@ -70,6 +69,8 @@ const styleSrcUrls = [
 const fontSrcUrls = [
   "'self'",
   "https://fonts.gstatic.com",
+  "https://calculatorsonline.com.au",
+  "data:"
 ];
 
 // Define allowed connect sources
@@ -93,12 +94,13 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: scriptSrcUrls,
       styleSrc: styleSrcUrls,
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      fontSrc: fontSrcUrls,
       imgSrc: ["'self'", "data:", "https:", "https://calculatorsonline.com.au"],
       connectSrc: connectSrcUrls,
       frameSrc: ["'self'", "https://calculatorsonline.com.au"],
       objectSrc: ["'none'"],
-      mediaSrc: ["'none'"]
+      mediaSrc: ["'none'"],
+      workerSrc: ["'self'"]
     },
   })
 );
@@ -270,6 +272,8 @@ app.post('/api/hecs/calculate', [
   body('growth').isFloat({ min: 0, max: 100 }).withMessage('Growth rate must be between 0 and 100')
 ], async (req, res) => {
   try {
+    console.log('Received calculation request:', req.body); // Debug log
+
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ error: errors.array()[0].msg });
@@ -277,7 +281,7 @@ app.post('/api/hecs/calculate', [
 
     const { debt, income, growth } = req.body;
     
-    // Calculate repayment schedule using the REPAYMENT_BANDS constant
+    // Calculate repayment schedule
     const schedule = [];
     let remainingDebt = debt;
     let currentIncome = income;
@@ -302,6 +306,8 @@ app.post('/api/hecs/calculate', [
       currentIncome *= (1 + growth / 100);
       year++;
     }
+
+    console.log('Calculation completed:', { yearsToRepay: schedule.length }); // Debug log
 
     res.json({
       yearsToRepay: schedule.length,

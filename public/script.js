@@ -17,7 +17,8 @@ function initializeHecsDebtCalculator() {
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+    console.log('Form submitted');
+
     clearError();
     clearAnalysis();
 
@@ -26,6 +27,8 @@ function initializeHecsDebtCalculator() {
       income: parseFloat(document.getElementById('income').value),
       growth: parseFloat(document.getElementById('growth').value)
     };
+
+    console.log('Form data:', formData);
 
     // Validate inputs
     if (isNaN(formData.debt) || formData.debt <= 0) {
@@ -50,10 +53,13 @@ function initializeHecsDebtCalculator() {
       const response = await fetch('/api/hecs/calculate', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
         body: JSON.stringify(formData)
       });
+
+      console.log('Response status:', response.status);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -61,6 +67,7 @@ function initializeHecsDebtCalculator() {
       }
 
       const data = await response.json();
+      console.log('Response data:', data);
       
       if (data.yearsToRepay && data.repaymentSchedule) {
         displayResults(data.yearsToRepay, data.repaymentSchedule);
@@ -91,21 +98,25 @@ function initializeHecsDebtCalculator() {
   }
 
   function showSpinner() {
-    spinner.hidden = false;
+    if (spinner) spinner.hidden = false;
   }
 
   function hideSpinner() {
-    spinner.hidden = true;
+    if (spinner) spinner.hidden = true;
   }
 
   function disableSubmitButton(disable) {
-    submitButton.disabled = disable;
-    submitButton.textContent = disable ? 'Calculating...' : 'Calculate';
+    if (submitButton) {
+      submitButton.disabled = disable;
+      submitButton.textContent = disable ? 'Calculating...' : 'Calculate';
+    }
   }
 
   function clearAnalysis() {
-    analysisDiv.innerHTML = '';
-    analysisDiv.style.display = 'none';
+    if (analysisDiv) {
+      analysisDiv.innerHTML = '';
+      analysisDiv.style.display = 'none';
+    }
   }
 }
 
