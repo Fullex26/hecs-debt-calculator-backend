@@ -1,6 +1,38 @@
 let messageHandler;
 
 document.addEventListener('DOMContentLoaded', function() {
+  const spinner = document.getElementById('tax-spinner');
+  const fallback = document.getElementById('tax-fallback');
+  const calculator = document.getElementById('atataxcalculator');
+
+  // Show loading spinner
+  if (spinner) spinner.hidden = false;
+
+  // Initialize tax calculator
+  if (window.ATATaxCalculator) {
+    try {
+      window.ATATaxCalculator.init({
+        container: 'atataxcalculator',
+        theme: 'light',
+        onLoad: function() {
+          if (spinner) spinner.hidden = true;
+        },
+        onError: function() {
+          if (spinner) spinner.hidden = true;
+          if (fallback) fallback.hidden = false;
+        }
+      });
+    } catch (error) {
+      console.error('Error initializing tax calculator:', error);
+      if (spinner) spinner.hidden = true;
+      if (fallback) fallback.hidden = false;
+    }
+  } else {
+    console.error('Tax calculator script not loaded');
+    if (spinner) spinner.hidden = true;
+    if (fallback) fallback.hidden = false;
+  }
+
   // Create message handler
   messageHandler = function(event) {
     if (event.origin !== 'https://calculatorsonline.com.au') return;

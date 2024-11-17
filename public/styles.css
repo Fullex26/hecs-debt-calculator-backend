@@ -944,3 +944,30 @@ footer p {
   font-weight: 500;
   color: var(--text-primary);
 }
+
+/* Tax Calculator Loading States */
+.tax-calculator-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+}
+
+.tax-calculator-error {
+  text-align: center;
+  padding: 2rem;
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  color: var(--error-color);
+}
+
+/* Ensure the calculator container has minimum dimensions */
+#atataxcalculator {
+  min-height: 400px;
+  width: 100%;
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}

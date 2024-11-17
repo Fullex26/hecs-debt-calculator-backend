@@ -49,10 +49,8 @@ const REPAYMENT_BANDS = [
 const scriptSrcUrls = [
   "'self'",
   "'unsafe-inline'",
-  "'unsafe-eval'",
-  'https://calculatorsonline.com.au',
-  'https://cdn.jsdelivr.net',
-  'https://ajax.googleapis.com',
+  "https://cdn.jsdelivr.net/npm/chart.js",
+  "https://calculatorsonline.com.au",
 ];
 
 // Define allowed style sources
@@ -60,17 +58,18 @@ const styleSrcUrls = [
   "'self'",
   "'unsafe-inline'",
   "https://fonts.googleapis.com",
-  "https://fonts.gstatic.com",
-  "https://cdnjs.cloudflare.com",
-  "https://calculatorsonline.com.au"
 ];
 
 // Define allowed font sources
 const fontSrcUrls = [
   "'self'",
   "https://fonts.gstatic.com",
-  "https://fonts.googleapis.com",
-  "data:"
+];
+
+// Define allowed connect sources
+const connectSrcUrls = [
+  "'self'",
+  "https://calculatorsonline.com.au",
 ];
 
 // Configure Helmet's CSP
@@ -80,10 +79,10 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: scriptSrcUrls,
       styleSrc: styleSrcUrls,
+      connectSrc: connectSrcUrls,
       fontSrc: fontSrcUrls,
       imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "https://calculatorsonline.com.au"],
-      objectSrc: ["'none'"],
+      frameSrc: ["'self'", "https://calculatorsonline.com.au"],
     },
   })
 );
