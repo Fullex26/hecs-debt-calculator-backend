@@ -1,36 +1,50 @@
 // script.js
 
 document.addEventListener('DOMContentLoaded', function() {
+  const currentPage = document.body.getAttribute('data-page');
+
+  if (currentPage === 'hecs-debt-calculator') {
+    initializeHecsDebtCalculator();
+  } else if (currentPage === 'tax-calculator') {
+    initializeTaxCalculator();
+  }
+});
+
+/**
+ * Initializes the HECS Debt Calculator functionalities.
+ */
+function initializeHecsDebtCalculator() {
   const form = document.getElementById('hecs-form');
   const analysisDiv = document.getElementById('analysis');
   const spinner = document.getElementById('spinner');
+  const submitButton = form.querySelector('button[type="submit"]');
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
 
+    // Clear previous errors and results
+    clearError();
+    clearAnalysis();
+
     // Retrieve and parse input values
-    const debt = parseFloat(document.getElementById('debt').value);
-    const income = parseFloat(document.getElementById('income').value);
-    const growth = parseFloat(document.getElementById('growth').value);
+    const debtInput = document.getElementById('debt');
+    const incomeInput = document.getElementById('income');
+    const growthInput = document.getElementById('growth');
+
+    const debt = parseFloat(debtInput.value);
+    const income = parseFloat(incomeInput.value);
+    const growth = parseFloat(growthInput.value);
 
     // Validate inputs
-    if (isNaN(debt) || debt <= 0) {
-      displayError('Please enter a valid HECS debt amount.');
+    const validationErrors = validateInputs(debt, income, growth);
+    if (validationErrors.length > 0) {
+      displayError(validationErrors.join(' '));
       return;
     }
 
-    if (isNaN(income) || income <= 0) {
-      displayError('Please enter a valid annual income.');
-      return;
-    }
-
-    if (isNaN(growth) || growth < 0) {
-      displayError('Please enter a valid expected income growth rate.');
-      return;
-    }
-
-    // Show the spinner
+    // Show the spinner and disable the submit button
     showSpinner();
+    disableSubmitButton(true);
 
     try {
       // Send data to the backend API
@@ -44,63 +58,114 @@ document.addEventListener('DOMContentLoaded', function() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'An error occurred.');
+        throw new Error(errorData.error || 'An unexpected error occurred.');
       }
 
       const data = await response.json();
       const { yearsToRepay, repaymentSchedule } = data;
 
-      let message;
-
-      if (yearsToRepay <= 30) {
-        message = `Based on your inputs, it will take approximately <strong>${yearsToRepay}</strong> year(s) to repay your HECS debt.`;
-      } else {
-        message = `Based on your inputs, it will take more than 30 years to repay your HECS debt. Please review your inputs or consider seeking financial advice.`;
-      }
-
-      // Generate the repayment table
-      const tableHTML = generateRepaymentTable(repaymentSchedule);
-
-      // Generate the repayment chart
-      const chartHTML = `<canvas id="repaymentChart" aria-label="Repayment Progress Chart" role="img"></canvas>`;
-
-      // Display the analysis with a fade-in effect
-      analysisDiv.innerHTML = `<p>${message}</p>${tableHTML}${chartHTML}`;
-      analysisDiv.classList.add('show');
-
-      // Render the chart
-      renderChart(repaymentSchedule);
-
+      // Generate and display results
+      displayResults(yearsToRepay, repaymentSchedule);
     } catch (error) {
       displayError(error.message);
     } finally {
-      // Hide the spinner
+      // Hide the spinner and enable the submit button
       hideSpinner();
+      disableSubmitButton(false);
     }
   });
 
+  /**
+   * Validates the input values.
+   * @param {number} debt - The HECS debt amount.
+   * @param {number} income - The annual income.
+   * @param {number} growth - The expected income growth rate.
+   * @returns {Array} - An array of error messages.
+   */
+  function validateInputs(debt, income, growth) {
+    const errors = [];
+
+    if (isNaN(debt) || debt <= 0) {
+      errors.push('Please enter a valid HECS debt amount.');
+    }
+
+    if (isNaN(income) || income <= 0) {
+      errors.push('Please enter a valid annual income.');
+    }
+
+    if (isNaN(growth) || growth < 0 || growth > 100) {
+      errors.push('Please enter a valid expected income growth rate (0-100%).');
+    }
+
+    return errors;
+  }
+
+  /**
+   * Displays an error message above the form.
+   * @param {string} message - The error message to display.
+   */
   function displayError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'form-error';
+    errorDiv.className = 'error-message';
+    errorDiv.setAttribute('role', 'alert'); // For ARIA live regions
+    errorDiv.textContent = message;
+
+    form.prepend(errorDiv);
+
+    // Shift focus to the error message for accessibility
+    errorDiv.focus();
+  }
+
+  /**
+   * Clears any existing error messages.
+   */
+  function clearError() {
     const existingError = document.getElementById('form-error');
     if (existingError) {
       existingError.remove();
     }
-
-    const errorDiv = document.createElement('div');
-    errorDiv.id = 'form-error';
-    errorDiv.className = 'error-message';
-    errorDiv.textContent = message;
-
-    form.prepend(errorDiv);
   }
 
-  function showSpinner() {
-    spinner.hidden = false;
+  /**
+   * Displays the repayment results, including the message, table, and chart.
+   * @param {number} yearsToRepay - The number of years to repay the debt.
+   * @param {Array} repaymentSchedule - The repayment schedule data.
+   */
+  function displayResults(yearsToRepay, repaymentSchedule) {
+    const message = generateMessage(yearsToRepay);
+    const tableHTML = generateRepaymentTable(repaymentSchedule);
+    const chartHTML = `<canvas id="repaymentChart" aria-label="Repayment Progress Chart" role="img"></canvas>`;
+
+    // Insert the results into the analysis div
+    analysisDiv.innerHTML = `<p>${message}</p>${tableHTML}${chartHTML}`;
+    analysisDiv.classList.add('show');
+
+    // Render the chart
+    renderChart(repaymentSchedule);
+
+    // Announce the results for screen readers
+    analysisDiv.setAttribute('aria-live', 'polite');
   }
 
-  function hideSpinner() {
-    spinner.hidden = true;
+  /**
+   * Generates a message based on the years to repay.
+   * @param {number} years - The number of years to repay.
+   * @returns {string} - The generated message.
+   */
+  function generateMessage(years) {
+    if (years <= 30) {
+      return `Based on your inputs, it will take approximately <strong>${years}</strong> year(s) to repay your HECS debt.`;
+    } else {
+      return `Based on your inputs, it will take more than 30 years to repay your HECS debt. Please review your inputs or consider seeking financial advice.`;
+    }
   }
 
+  /**
+   * Generates the HTML for the repayment schedule table.
+   * @param {Array} schedule - The repayment schedule data.
+   * @returns {string} - The HTML string for the table.
+   */
   function generateRepaymentTable(schedule) {
     let tableHTML = `
       <h2>Year-by-Year Repayment Schedule</h2>
@@ -139,10 +204,19 @@ document.addEventListener('DOMContentLoaded', function() {
     return tableHTML;
   }
 
+  /**
+   * Formats a number as Australian currency.
+   * @param {number} amount - The amount to format.
+   * @returns {string} - The formatted currency string.
+   */
   function formatCurrency(amount) {
     return `$${parseFloat(amount).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 
+  /**
+   * Renders the repayment chart using Chart.js.
+   * @param {Array} schedule - The repayment schedule data.
+   */
   function renderChart(schedule) {
     // Extract data for the chart
     const labels = schedule.map(entry => `Year ${entry.year}`);
@@ -216,4 +290,46 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-});
+
+  /**
+   * Displays a loading spinner.
+   */
+  function showSpinner() {
+    spinner.hidden = false;
+  }
+
+  /**
+   * Hides the loading spinner.
+   */
+  function hideSpinner() {
+    spinner.hidden = true;
+  }
+
+  /**
+   * Disables or enables the submit button.
+   * @param {boolean} disable - Whether to disable the button.
+   */
+  function disableSubmitButton(disable) {
+    submitButton.disabled = disable;
+    submitButton.textContent = disable ? 'Calculating...' : 'Calculate';
+  }
+
+  /**
+   * Clears the analysis results.
+   */
+  function clearAnalysis() {
+    analysisDiv.innerHTML = '';
+    analysisDiv.classList.remove('show');
+  }
+}
+
+/**
+ * Initializes the Tax Calculator functionalities.
+ * Currently, since the Tax Calculator is an embedded third-party widget,
+ * there may not be any additional scripts required unless you plan to interact with the widget.
+ */
+function initializeTaxCalculator() {
+  // Example: If you need to interact with the widget via JavaScript,
+  // you can add event listeners or additional functionalities here.
+  // For now, no additional scripts are required.
+}

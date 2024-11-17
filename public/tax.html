@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tax Calculator - HECS Debt Calculator</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Correct Font Awesome CDN -->
+  
+  <!-- Font Awesome CDN -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -17,13 +18,13 @@
 <body>
   <div class="container">
     <header>
-      <nav class="navbar">
+      <nav class="navbar" aria-label="Main Navigation">
         <ul>
           <li><a href="index.html">HECS Debt Calculator</a></li>
           <li><a href="tax.html" class="active">Tax Calculator</a></li>
         </ul>
       </nav>
-      <i class="fas fa-calculator header-icon"></i>
+      <i class="fas fa-calculator header-icon" aria-hidden="true"></i>
       <h1>Tax Calculator</h1>
       <p>Calculate your annual tax obligations with ease.</p>
     </header>
@@ -37,7 +38,45 @@
           <p>Tax Calculator from <a href="https://calculatorsonline.com.au">calculatorsonline.com.au</a></p>
         </div>
       </div>
-      <script type="text/javascript" src="//calculatorsonline.com.au/external/!main/widget.min.js"></script>
+      
+      <!-- Loading Spinner -->
+      <div id="tax-spinner" class="spinner" aria-label="Loading Tax Calculator" role="status" hidden>
+        <div class="double-bounce1"></div>
+        <div class="double-bounce2"></div>
+      </div>
+
+      <!-- Fallback Message -->
+      <div id="tax-fallback" class="error-message" hidden>
+        Unable to load the Tax Calculator at this time. Please try again later.
+      </div>
+      
+      <!-- Inline Script to Handle Widget Loading -->
+      <script type="text/javascript" src="https://calculatorsonline.com.au/external/!main/widget.min.js" defer></script>
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const spinner = document.getElementById('tax-spinner');
+          const fallback = document.getElementById('tax-fallback');
+          const taxCalculatorTable = document.querySelector('.atataxcalculator-table');
+
+          // Show spinner while loading
+          spinner.hidden = false;
+
+          // Listen for the widget's load event if available
+          // This depends on the widget's implementation
+          // Replace 'widgetLoaded' with the actual event name if available
+          window.addEventListener('widgetLoaded', function() {
+            spinner.hidden = true;
+          });
+
+          // Fallback: hide spinner and show error if widget doesn't load within 10 seconds
+          setTimeout(function() {
+            if (!taxCalculatorTable || !taxCalculatorTable.innerHTML.trim()) {
+              spinner.hidden = true;
+              fallback.hidden = false;
+            }
+          }, 10000); // 10 seconds
+        });
+      </script>
     </main>
 
     <footer>
