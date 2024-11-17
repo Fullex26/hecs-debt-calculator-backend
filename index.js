@@ -51,6 +51,7 @@ const scriptSrcUrls = [
   "'unsafe-eval'",
   'https://calculatorsonline.com.au',
   'https://cdn.jsdelivr.net',
+  'https://ajax.googleapis.com',
 ];
 
 // Define allowed style sources
