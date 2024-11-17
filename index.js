@@ -9,6 +9,7 @@ const { body, validationResult } = require('express-validator'); // For input va
 const rateLimit = require('express-rate-limit'); // For rate limiting
 const helmet = require('helmet'); // For setting secure HTTP headers
 const xss = require('xss-clean'); // For sanitizing user input
+const TaxCalculation = require('./models/TaxCalculation');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -64,7 +65,8 @@ const styleSrcUrls = [
 // Define allowed font sources
 const fontSrcUrls = [
   "'self'",
-  'https://cdnjs.cloudflare.com', // For Font Awesome fonts
+  'https://cdnjs.cloudflare.com',
+  'https://calculatorsonline.com.au',
 ];
 
 // Configure Helmet's CSP
@@ -74,7 +76,10 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: scriptSrcUrls,
       styleSrc: [...styleSrcUrls, "'unsafe-inline'"],
-      fontSrc: fontSrcUrls,
+      fontSrc: [
+        ...fontSrcUrls,
+        'https://calculatorsonline.com.au'
+      ],
       imgSrc: ["'self'", 'data:', 'https://calculatorsonline.com.au'],
       connectSrc: ["'self'", 'https://calculatorsonline.com.au'],
       objectSrc: ["'none'"],
@@ -219,6 +224,39 @@ app.post(
     }
   }
 );
+
+/**
+ * @route   POST /api/tax-calculation
+ * @desc    Save tax calculation data
+ * @access  Public
+ */
+app.post('/api/tax-calculation', [
+  body('income').isFloat({ gt: 0 }).withMessage('Income must be a positive number'),
+  body('taxYear').notEmpty().withMessage('Tax year is required'),
+  body('residencyStatus').isIn(['resident', 'foreign-resident', 'working-holiday'])
+    .withMessage('Invalid residency status'),
+  body('medicareLevyExemption').isBoolean().withMessage('Medicare levy exemption must be boolean'),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const taxCalculation = new TaxCalculation({
+      income: req.body.income,
+      taxYear: req.body.taxYear,
+      residencyStatus: req.body.residencyStatus,
+      medicareLevyExemption: req.body.medicareLevyExemption
+    });
+
+    await taxCalculation.save();
+    res.status(201).json({ message: 'Tax calculation saved successfully' });
+  } catch (error) {
+    console.error('Error saving tax calculation:', error);
+    res.status(500).json({ error: 'Failed to save tax calculation' });
+  }
+});
 
 // -----------------------------
 // Global Error Handling Middleware

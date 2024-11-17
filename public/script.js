@@ -123,39 +123,39 @@ function initializeHecsDebtCalculator() {
    * @param {Array} repaymentSchedule - The repayment schedule data.
    */
   function displayResults(yearsToRepay, repaymentSchedule) {
-    console.log('Displaying results:', { yearsToRepay, repaymentSchedule });
+    const analysisDiv = document.getElementById('analysis');
     
-    if (!yearsToRepay || !repaymentSchedule || !Array.isArray(repaymentSchedule)) {
-      console.error('Invalid data format for results');
-      displayError('Unable to display results due to invalid data format');
-      return;
-    }
+    // Calculate key metrics
+    const initialDebt = repaymentSchedule[0].remainingDebt + repaymentSchedule[0].repayment;
+    const totalRepaid = repaymentSchedule[repaymentSchedule.length - 1].totalRepayment;
+    const initialIncome = repaymentSchedule[0].income;
+    const finalIncome = repaymentSchedule[repaymentSchedule.length - 1].income;
+    const incomeGrowth = ((finalIncome - initialIncome) / initialIncome * 100).toFixed(1);
 
-    const message = generateMessage(yearsToRepay);
-    const tableHTML = generateRepaymentTable(repaymentSchedule);
-    const chartHTML = `<canvas id="repaymentChart" aria-label="Repayment Progress Chart" role="img"></canvas>`;
-
-    analysisDiv.innerHTML = `
-      <div class="results-container">
-        <p class="results-message">${message}</p>
-        ${tableHTML}
-        ${chartHTML}
+    const summaryHTML = `
+      <div class="results-summary">
+        <h2>Repayment Analysis</h2>
+        <p class="results-message">Based on your inputs, it will take approximately 
+          <strong>${yearsToRepay}</strong> years to repay your HECS debt of 
+          <strong>${formatCurrency(initialDebt)}</strong>.
+        </p>
+        <p>Your income will grow from <strong>${formatCurrency(initialIncome)}</strong> 
+           to <strong>${formatCurrency(finalIncome)}</strong> 
+           (${incomeGrowth}% total increase).
+        </p>
       </div>
     `;
-    
-    analysisDiv.classList.add('show');
 
-    // Add a small delay before rendering the chart to ensure the canvas is ready
-    setTimeout(() => {
-      try {
-        renderChart(repaymentSchedule);
-      } catch (error) {
-        console.error('Chart rendering error:', error);
-        displayError('Unable to render the chart');
-      }
-    }, 100);
+    analysisDiv.innerHTML = `
+      ${summaryHTML}
+      ${generateRepaymentTable(repaymentSchedule)}
+      <div class="chart-container">
+        <canvas id="repaymentChart" aria-label="Repayment Progress Chart" role="img"></canvas>
+      </div>
+    `;
 
-    analysisDiv.setAttribute('aria-live', 'polite');
+    // Render the chart with a slight delay to ensure the canvas is ready
+    setTimeout(() => renderChart(repaymentSchedule), 100);
   }
 
   /**
@@ -178,29 +178,59 @@ function initializeHecsDebtCalculator() {
    */
   function generateRepaymentTable(schedule) {
     let tableHTML = `
-      <h2>Year-by-Year Repayment Schedule</h2>
+      <div class="repayment-summary">
+        <h2>Repayment Schedule Summary</h2>
+        <div class="summary-cards">
+          <div class="summary-card">
+            <h3>Total Years</h3>
+            <p>${schedule.length}</p>
+          </div>
+          <div class="summary-card">
+            <h3>Total Repayment</h3>
+            <p>${formatCurrency(schedule[schedule.length - 1].totalRepayment)}</p>
+          </div>
+          <div class="summary-card">
+            <h3>Final Income</h3>
+            <p>${formatCurrency(schedule[schedule.length - 1].income)}</p>
+          </div>
+        </div>
+      </div>
       <div class="table-container">
+        <h2>Year-by-Year Breakdown</h2>
         <table>
           <thead>
             <tr>
               <th>Year</th>
-              <th>Income (AUD)</th>
-              <th>Annual Repayment (AUD)</th>
-              <th>Total Repayment (AUD)</th>
-              <th>Remaining Debt (AUD)</th>
+              <th>Income</th>
+              <th>Repayment Rate</th>
+              <th>Annual Payment</th>
+              <th>Total Paid</th>
+              <th>Remaining Debt</th>
+              <th>Progress</th>
             </tr>
           </thead>
           <tbody>
     `;
 
+    let initialDebt = schedule[0].remainingDebt + schedule[0].repayment;
+
     schedule.forEach(entry => {
+      const progressPercentage = ((initialDebt - entry.remainingDebt) / initialDebt) * 100;
+      const repaymentRate = (entry.repayment / entry.income * 100).toFixed(1);
+
       tableHTML += `
         <tr>
           <td>${entry.year}</td>
           <td>${formatCurrency(entry.income)}</td>
+          <td>${repaymentRate}%</td>
           <td>${formatCurrency(entry.repayment)}</td>
           <td>${formatCurrency(entry.totalRepayment)}</td>
           <td>${formatCurrency(entry.remainingDebt)}</td>
+          <td>
+            <div class="progress-bar" title="${progressPercentage.toFixed(1)}% paid">
+              <div class="progress" style="width: ${progressPercentage}%"></div>
+            </div>
+          </td>
         </tr>
       `;
     });
