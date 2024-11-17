@@ -570,3 +570,40 @@ tr:hover {
     min-width: 800px;
   }
 }
+
+.results-container {
+  margin-top: 2rem;
+}
+
+.chart-container {
+  height: 400px;
+  margin: 2rem 0;
+}
+
+.table-container {
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.error-message {
+  color: #e74c3c;
+  padding: 1rem;
+  background-color: #fde8e8;
+  border-radius: 4px;
+  margin: 1rem 0;
+}
+
+.show {
+  display: block;
+}
