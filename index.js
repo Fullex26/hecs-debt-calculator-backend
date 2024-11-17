@@ -49,6 +49,7 @@ const scriptSrcUrls = [
   "'self'",
   'https://calculatorsonline.com.au',
   'https://cdn.jsdelivr.net', // For Chart.js
+  'https://ajax.googleapis.com', // For jQuery
 ];
 
 // Define allowed style sources
