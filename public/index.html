@@ -6,7 +6,7 @@
   <title>HECS Debt Calculator</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
-  
+
   <!-- Font Awesome CDN -->
   <link
     rel="stylesheet"
@@ -15,20 +15,20 @@
     crossorigin="anonymous"
     referrerpolicy="no-referrer"
   />
-  
+
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body data-page="hecs-calculator">
   <div class="container">
     <header>
-      <nav class="navbar">
+      <nav class="navbar" aria-label="Main Navigation">
         <ul>
           <li><a href="index.html" class="active">HECS Debt Calculator</a></li>
           <li><a href="tax.html">Tax Calculator</a></li>
         </ul>
       </nav>
-      <i class="fas fa-dollar-sign header-icon"></i>
+      <i class="fas fa-dollar-sign header-icon" aria-hidden="true"></i>
       <h1>HECS Debt Calculator</h1>
       <p>Understand your HECS debt and plan your repayment journey.</p>
     </header>
@@ -111,6 +111,7 @@
     </footer>
   </div>
 
+  <!-- Include external JavaScript files -->
   <script src="script.js"></script>
 </body>
 </html>
