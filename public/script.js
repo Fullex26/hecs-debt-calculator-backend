@@ -17,29 +17,28 @@ function initializeHecsDebtCalculator() {
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    console.log('Form submitted');
-
+    
     clearError();
     clearAnalysis();
 
-    // Get and validate input values
-    const debt = parseFloat(document.getElementById('debt').value);
-    const income = parseFloat(document.getElementById('income').value);
-    const growth = parseFloat(document.getElementById('growth').value);
+    const formData = {
+      debt: parseFloat(document.getElementById('debt').value),
+      income: parseFloat(document.getElementById('income').value),
+      growth: parseFloat(document.getElementById('growth').value)
+    };
 
-    console.log('Input values:', { debt, income, growth });
-
-    if (isNaN(debt) || debt <= 0) {
+    // Validate inputs
+    if (isNaN(formData.debt) || formData.debt <= 0) {
       displayError('Please enter a valid HECS debt amount');
       return;
     }
 
-    if (isNaN(income) || income <= 0) {
+    if (isNaN(formData.income) || formData.income <= 0) {
       displayError('Please enter a valid income amount');
       return;
     }
 
-    if (isNaN(growth) || growth < 0 || growth > 100) {
+    if (isNaN(formData.growth) || formData.growth < 0 || formData.growth > 100) {
       displayError('Please enter a valid growth rate between 0 and 100');
       return;
     }
@@ -53,15 +52,16 @@ function initializeHecsDebtCalculator() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ debt, income, growth })
+        body: JSON.stringify(formData)
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to calculate');
+      }
 
       const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to calculate');
-      }
-
       if (data.yearsToRepay && data.repaymentSchedule) {
         displayResults(data.yearsToRepay, data.repaymentSchedule);
       } else {

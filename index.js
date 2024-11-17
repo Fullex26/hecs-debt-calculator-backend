@@ -50,9 +50,12 @@ const scriptSrcUrls = [
   "'self'",
   "'unsafe-inline'",
   "'unsafe-eval'",
-  "https://cdn.jsdelivr.net/",
+  "https://cdn.jsdelivr.net",
   "https://calculatorsonline.com.au",
-  "//calculatorsonline.com.au"
+  "http://calculatorsonline.com.au",
+  "https://ajax.googleapis.com",
+  "https://*.googleapis.com",
+  "https://code.jquery.com"
 ];
 
 // Define allowed style sources
@@ -60,6 +63,7 @@ const styleSrcUrls = [
   "'self'",
   "'unsafe-inline'",
   "https://fonts.googleapis.com",
+  "https://calculatorsonline.com.au"
 ];
 
 // Define allowed font sources
@@ -72,7 +76,8 @@ const fontSrcUrls = [
 const connectSrcUrls = [
   "'self'",
   "https://calculatorsonline.com.au",
-  "//calculatorsonline.com.au"
+  "http://calculatorsonline.com.au",
+  "https://ajax.googleapis.com"
 ];
 
 // Define allowed frame sources
@@ -88,10 +93,12 @@ app.use(
       defaultSrc: ["'self'"],
       scriptSrc: scriptSrcUrls,
       styleSrc: styleSrcUrls,
-      connectSrc: connectSrcUrls,
-      fontSrc: fontSrcUrls,
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "https://calculatorsonline.com.au"],
-      frameSrc: frameSrcUrls
+      connectSrc: connectSrcUrls,
+      frameSrc: ["'self'", "https://calculatorsonline.com.au"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'none'"]
     },
   })
 );
@@ -263,24 +270,42 @@ app.post('/api/hecs/calculate', [
   body('growth').isFloat({ min: 0, max: 100 }).withMessage('Growth rate must be between 0 and 100')
 ], async (req, res) => {
   try {
-    // Validate request
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ error: errors.array()[0].msg });
     }
 
     const { debt, income, growth } = req.body;
-    console.log('Received calculation request:', { debt, income, growth });
+    
+    // Calculate repayment schedule using the REPAYMENT_BANDS constant
+    const schedule = [];
+    let remainingDebt = debt;
+    let currentIncome = income;
+    let year = 1;
 
-    // Calculate repayment schedule
-    const repaymentSchedule = calculateRepaymentSchedule(debt, income, growth);
-    const yearsToRepay = repaymentSchedule.length;
+    while (remainingDebt > 0 && year <= 30) {
+      const repaymentRate = REPAYMENT_BANDS.find(band => 
+        currentIncome >= band.min && currentIncome <= band.max
+      )?.rate || 0;
 
-    console.log('Calculation completed:', { yearsToRepay });
+      const yearlyRepayment = currentIncome * repaymentRate;
+      
+      schedule.push({
+        year,
+        startingDebt: remainingDebt,
+        income: currentIncome,
+        repayment: yearlyRepayment,
+        remainingDebt: Math.max(0, remainingDebt - yearlyRepayment)
+      });
+
+      remainingDebt = Math.max(0, remainingDebt - yearlyRepayment);
+      currentIncome *= (1 + growth / 100);
+      year++;
+    }
 
     res.json({
-      yearsToRepay,
-      repaymentSchedule
+      yearsToRepay: schedule.length,
+      repaymentSchedule: schedule
     });
   } catch (error) {
     console.error('Calculation error:', error);
