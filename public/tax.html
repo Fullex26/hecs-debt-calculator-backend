@@ -21,8 +21,8 @@
         <h1 class="logo-text">HECS<span>Calculator</span></h1>
       </div>
       <ul>
-        <li><a href="index.html">HECS Calculator</a></li>
-        <li><a href="tax.html" class="active">Tax Calculator</a></li>
+        <li><a href="/">HECS Calculator</a></li>
+        <li><a href="/tax">Tax Calculator</a></li>
       </ul>
     </nav>
   </header>
@@ -30,23 +30,17 @@
   <main class="container">
     <div class="calculator-card">
       <h1>Tax Calculator</h1>
-      <p class="subtitle">Calculate your annual tax obligations with ease</p>
-
-      <!-- Embedded Tax Calculator -->
-      <div id="atataxcalculator" class="atataxcalculator-light calculator-wrapper">
-        <div class="atataxcalculator-options atataxcalculator-show-up"></div>
-        <div class="atataxcalculator-table atataxcalculator-show-up"></div>
-        <div class="atataxcalculator-anchors atataxcalculator-show-up">
-          <p class="attribution">Tax Calculator from <a href="https://calculatorsonline.com.au" target="_blank" rel="noopener noreferrer">calculatorsonline.com.au</a></p>
-        </div>
-      </div>
+      <p class="subtitle">Calculate your tax and Medicare levy</p>
       
-      <!-- Loading Spinner -->
-      <div id="tax-spinner" class="spinner-container" aria-label="Loading Tax Calculator" role="status" hidden>
+      <!-- Add loading spinner -->
+      <div id="tax-spinner" class="spinner-container" hidden>
         <div class="spinner"></div>
       </div>
 
-      <!-- Fallback Message -->
+      <!-- Add calculator container -->
+      <div id="atataxcalculator" class="calculator-wrapper"></div>
+
+      <!-- Add fallback message -->
       <div id="tax-fallback" class="error-message" hidden>
         Unable to load the Tax Calculator at this time. Please try again later.
       </div>
@@ -56,7 +50,7 @@
   <footer>
     <div class="container">
       <div class="footer-links">
-        <a href="privacy.html">Privacy Policy</a>
+        <a href="/privacy">Privacy Policy</a>
       </div>
       <p>&copy; 2024 HECS Calculator. All rights reserved.</p>
     </div>

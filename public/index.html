@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="/styles.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 </head>
 <body data-page="hecs-calculator">
   <header>
@@ -40,10 +40,9 @@
             name="debt" 
             required 
             min="1" 
-            step="100"
+            step="any"
             placeholder="Enter your HECS debt amount"
-            pattern="[0-9]*"
-            inputmode="numeric"
+            inputmode="decimal"
           >
         </div>
         
@@ -55,10 +54,9 @@
             name="income" 
             required 
             min="1" 
-            step="1000"
+            step="any"
             placeholder="Enter your annual income"
-            pattern="[0-9]*"
-            inputmode="numeric"
+            inputmode="decimal"
           >
         </div>
         
@@ -71,9 +69,8 @@
             required 
             min="0" 
             max="100" 
-            step="0.1"
+            step="any"
             placeholder="Enter expected growth rate"
-            pattern="[0-9]*\.?[0-9]*"
             inputmode="decimal"
           >
         </div>

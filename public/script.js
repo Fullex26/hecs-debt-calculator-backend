@@ -22,16 +22,16 @@ function initializeHecsDebtCalculator() {
     clearError();
     clearAnalysis();
 
-    // Get input values and convert to numbers
-    const debt = Number(document.getElementById('debt').value.replace(/[^0-9.-]+/g, ''));
-    const income = Number(document.getElementById('income').value.replace(/[^0-9.-]+/g, ''));
-    const growth = Number(document.getElementById('growth').value.replace(/[^0-9.-]+/g, ''));
+    // Get input values directly without regex replacement
+    const debt = parseFloat(document.getElementById('debt').value);
+    const income = parseFloat(document.getElementById('income').value);
+    const growth = parseFloat(document.getElementById('growth').value);
 
     console.log('Input values:', { debt, income, growth }); // Debug log
 
-    const validationErrors = validateInputs(debt, income, growth);
-    if (validationErrors.length > 0) {
-      displayError(validationErrors.join(' '));
+    // Validate inputs
+    if (!isValidInput(debt) || !isValidInput(income) || !isValidGrowthRate(growth)) {
+      displayError('Please enter valid numbers. Debt and income must be positive, and growth rate must be between 0 and 100.');
       return;
     }
 
@@ -44,11 +44,7 @@ function initializeHecsDebtCalculator() {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ 
-          debt: sanitizeNumber(debt), 
-          income: sanitizeNumber(income), 
-          growth: sanitizeNumber(growth, 0, 100) 
-        })
+        body: JSON.stringify({ debt, income, growth })
       });
       
       console.log('Response data:', data);
@@ -67,29 +63,13 @@ function initializeHecsDebtCalculator() {
     }
   });
 
-  function sanitizeNumber(value, min = 0, max = Infinity) {
-    const num = Number(value);
-    if (isNaN(num) || !isFinite(num)) return null;
-    return Math.min(Math.max(num, min), max);
+  // Helper functions for validation
+  function isValidInput(value) {
+    return !isNaN(value) && isFinite(value) && value > 0;
   }
 
-  function validateInputs(debt, income, growth) {
-    const errors = [];
-    console.log('Validating inputs:', { debt, income, growth }); // Debug log
-
-    if (!debt || isNaN(debt) || debt <= 0) {
-      errors.push('Please enter a valid HECS debt amount greater than 0.');
-    }
-
-    if (!income || isNaN(income) || income <= 0) {
-      errors.push('Please enter a valid annual income greater than 0.');
-    }
-
-    if (!growth || isNaN(growth) || growth < 0 || growth > 100) {
-      errors.push('Please enter a valid growth rate between 0 and 100.');
-    }
-
-    return errors;
+  function isValidGrowthRate(value) {
+    return !isNaN(value) && isFinite(value) && value >= 0 && value <= 100;
   }
 
   function displayError(message) {
