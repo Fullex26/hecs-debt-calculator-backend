@@ -44,8 +44,40 @@ const REPAYMENT_BANDS = [
 // Middleware Configuration
 // -----------------------------
 
-// Set various HTTP headers for app security
-app.use(helmet());
+// Define allowed script sources
+const scriptSrcUrls = [
+  "'self'",
+  'https://calculatorsonline.com.au',
+  'https://cdn.jsdelivr.net', // For Chart.js
+];
+
+// Define allowed style sources
+const styleSrcUrls = [
+  "'self'",
+  'https://cdnjs.cloudflare.com', // For external styles like Font Awesome
+];
+
+// Define allowed font sources
+const fontSrcUrls = [
+  "'self'",
+  'https://cdnjs.cloudflare.com', // For Font Awesome fonts
+];
+
+// Configure Helmet's CSP
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: scriptSrcUrls,
+      styleSrc: styleSrcUrls,
+      fontSrc: fontSrcUrls,
+      imgSrc: ["'self'", 'data:', 'https://calculatorsonline.com.au'],
+      connectSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  })
+);
 
 // Parse incoming JSON requests and sanitize user input
 app.use(express.json({ limit: '10kb' })); // Limit body size
