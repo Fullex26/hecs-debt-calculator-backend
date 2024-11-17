@@ -17,7 +17,7 @@
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
   --radius-md: 0.5rem;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 /* -----------------------------
@@ -30,8 +30,7 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--background-color);
   color: var(--text-primary);
   line-height: 1.6;
@@ -678,43 +677,6 @@ th, td {
   }
 }
 
-/* Add fallback font loading */
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: local('Inter Regular'), local('Inter-Regular'),
-       url('/fonts/inter-regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: local('Inter Medium'), local('Inter-Medium'),
-       url('/fonts/inter-medium.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: local('Inter SemiBold'), local('Inter-SemiBold'),
-       url('/fonts/inter-semibold.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: local('Inter Bold'), local('Inter-Bold'),
-       url('/fonts/inter-bold.woff2') format('woff2');
-}
-
 /* Calculator Wrapper */
 .calculator-wrapper {
   background: var(--card-background);
@@ -917,4 +879,68 @@ footer p {
   .policy-section h2 {
     font-size: 1.25rem;
   }
+}
+
+/* Add to your existing styles */
+.error-page {
+  text-align: center;
+  padding: 4rem 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.error-page h1 {
+  color: var(--text-primary);
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.error-page p {
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.error-page .button {
+  display: inline-block;
+  background: var(--primary-color);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+
+.error-page .button:hover {
+  background: var(--primary-dark);
+}
+
+/* Privacy Policy Additional Styles */
+.disclaimer-section {
+  background: var(--background-color);
+  padding: 1.5rem;
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
+}
+
+.disclaimer-section h3 {
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.disclaimer-section p {
+  margin-bottom: 1rem;
+}
+
+.policy-section h2 {
+  color: var(--primary-color);
+  margin-top: 2rem;
+}
+
+.policy-footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  font-weight: 500;
+  color: var(--text-primary);
 }
