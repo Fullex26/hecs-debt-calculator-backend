@@ -10,6 +10,7 @@ const rateLimit = require('express-rate-limit'); // For rate limiting
 const helmet = require('helmet'); // For setting secure HTTP headers
 const xss = require('xss-clean'); // For sanitizing user input
 const TaxCalculation = require('./models/TaxCalculation');
+const Feedback = require('./models/Feedback');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -316,6 +317,38 @@ app.post('/api/hecs/calculate', [
   } catch (error) {
     console.error('Calculation error:', error);
     res.status(500).json({ error: 'Failed to process calculation' });
+  }
+});
+
+/**
+ * @route   POST /api/feedback
+ * @desc    Submit user feedback
+ * @access  Public
+ */
+app.post('/api/feedback', [
+  body('type').isIn(['bug', 'feature', 'general']).withMessage('Invalid feedback type'),
+  body('title').trim().isLength({ min: 1, max: 200 }).withMessage('Title must be between 1 and 200 characters'),
+  body('description').trim().isLength({ min: 1, max: 2000 }).withMessage('Description must be between 1 and 2000 characters'),
+  body('email').optional().isEmail().withMessage('Invalid email address')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const feedback = new Feedback({
+      type: req.body.type,
+      title: req.body.title,
+      description: req.body.description,
+      email: req.body.email || undefined
+    });
+
+    await feedback.save();
+    res.status(201).json({ message: 'Feedback submitted successfully' });
+  } catch (error) {
+    console.error('Error saving feedback:', error);
+    res.status(500).json({ error: 'Failed to submit feedback' });
   }
 });
 

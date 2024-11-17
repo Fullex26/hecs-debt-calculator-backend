@@ -10,8 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="/styles.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-  <script src="https://calculatorsonline.com.au/external/!main/widget.min.js"></script>
+  <link rel="stylesheet" href="https://calculatorsonline.com.au/external/!main/widget.min.css">
 </head>
 <body data-page="tax-calculator">
   <header>
@@ -31,8 +30,10 @@
       <h1>Tax Calculator</h1>
       <p class="subtitle">Calculate your tax and Medicare levy</p>
       
+      <div id="spinner" class="spinner"></div>
+      
       <!-- Tax Calculator Widget -->
-      <div id="atataxcalculator" class="atataxcalculator-light">
+      <div id="atataxcalculator" class="atataxcalculator-light" style="display: none;">
         <div class="atataxcalculator-options atataxcalculator-show-up"></div>
         <div class="atataxcalculator-table atataxcalculator-show-up"></div>
         <div class="atataxcalculator-anchors atataxcalculator-show-up">
@@ -56,16 +57,51 @@
     </div>
   </footer>
 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
   <script>
-    // Initialize calculator after page load
-    window.addEventListener('DOMContentLoaded', function() {
-      if (window.ATATaxCalculator) {
-        window.ATATaxCalculator.init({
-          container: 'atataxcalculator',
-          theme: 'light'
-        });
+    // Show spinner while loading
+    document.getElementById('spinner').style.display = 'block';
+    
+    // Function to initialize calculator
+    function initTaxCalculator() {
+      const calculator = document.getElementById('atataxcalculator');
+      const spinner = document.getElementById('spinner');
+      const fallback = document.getElementById('tax-fallback');
+
+      try {
+        if (window.ATATaxCalculator) {
+          window.ATATaxCalculator.init({
+            container: 'atataxcalculator',
+            theme: 'light',
+            onLoad: function() {
+              spinner.style.display = 'none';
+              calculator.style.display = 'block';
+            },
+            onError: function() {
+              spinner.style.display = 'none';
+              fallback.hidden = false;
+            }
+          });
+        } else {
+          throw new Error('Calculator not loaded');
+        }
+      } catch (error) {
+        console.error('Failed to initialize calculator:', error);
+        spinner.style.display = 'none';
+        fallback.hidden = false;
       }
-    });
+    }
+
+    // Load calculator script
+    const script = document.createElement('script');
+    script.src = 'https://calculatorsonline.com.au/external/!main/widget.min.js';
+    script.onload = initTaxCalculator;
+    script.onerror = function() {
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('tax-fallback').hidden = false;
+    };
+    document.body.appendChild(script);
   </script>
+  <script src="/feedback.js"></script>
 </body>
 </html>

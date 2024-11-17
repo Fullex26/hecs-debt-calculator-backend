@@ -50,7 +50,7 @@ function initializeHecsDebtCalculator() {
     disableSubmitButton(true);
 
     try {
-      const response = await fetch('/api/hecs/calculate', {
+      const response = await fetch('/api/calculate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
