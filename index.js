@@ -49,10 +49,8 @@ const REPAYMENT_BANDS = [
 const scriptSrcUrls = [
   "'self'",
   "'unsafe-inline'",
-  "'unsafe-eval'",
   "https://cdn.jsdelivr.net/",
-  "https://www.ato.gov.au/",
-  "https://*.ato.gov.au"
+  "https://paycalculator.com.au"
 ];
 
 // Define allowed style sources
@@ -77,8 +75,7 @@ const connectSrcUrls = [
 // Define allowed frame sources
 const frameSrcUrls = [
   "'self'",
-  "https://www.ato.gov.au/",
-  "https://*.ato.gov.au"
+  "https://paycalculator.com.au"
 ];
 
 // Configure Helmet's CSP
@@ -90,7 +87,7 @@ app.use(
       styleSrc: styleSrcUrls,
       connectSrc: connectSrcUrls,
       fontSrc: fontSrcUrls,
-      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      imgSrc: ["'self'", "data:", "https:"],
       frameSrc: frameSrcUrls
     },
   })
@@ -165,87 +162,59 @@ app.post(
   '/api/calculate',
   // Input validation and sanitization
   [
-    body('debt')
-      .isFloat({ gt: 0 })
-      .withMessage('Debt must be a number greater than 0.')
-      .toFloat(),
-    body('income')
-      .isFloat({ gt: 0 })
-      .withMessage('Income must be a number greater than 0.')
-      .toFloat(),
-    body('growth')
-      .isFloat({ min: 0, max: 100 })
-      .withMessage('Growth must be a number between 0 and 100.')
-      .toFloat(),
+    body('debt').isFloat({ min: 0 }).withMessage('Debt must be a positive number'),
+    body('income').isFloat({ min: 0 }).withMessage('Income must be a positive number'),
+    body('growth').isFloat({ min: 0, max: 100 }).withMessage('Growth rate must be between 0 and 100')
   ],
   async (req, res) => {
-    console.log('Received calculation request:', req.body); // Add this for debugging
-    
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array()); // Add this for debugging
-      return res.status(400).json({ error: errors.array()[0].msg });
-    }
-
-    const { debt, income, growth } = req.body;
-
     try {
-      // Initialize variables for calculation
-      let totalRepayment = 0;
-      let years = 0;
-      let currentIncome = income;
-      const repaymentSchedule = [];
-
-      // Calculate repayment schedule
-      while (totalRepayment < debt && years < 30) {
-        // Limit to 30 years to prevent infinite loops
-        // Find the appropriate repayment rate based on current income
-        const repaymentBand = REPAYMENT_BANDS.find(
-          (band) => currentIncome >= band.min && currentIncome <= band.max
-        );
-        const repaymentRate = repaymentBand ? repaymentBand.rate : 0.0;
-        const annualRepayment = currentIncome * repaymentRate;
-
-        // Determine repayment for the current year without exceeding the remaining debt
-        const repaymentThisYear = Math.min(
-          annualRepayment,
-          debt - totalRepayment
-        );
-        totalRepayment += repaymentThisYear;
-
-        // Add the current year's data to the repayment schedule
-        repaymentSchedule.push({
-          year: years + 1,
-          income: parseFloat(currentIncome.toFixed(2)),
-          repayment: parseFloat(repaymentThisYear.toFixed(2)),
-          totalRepayment: parseFloat(totalRepayment.toFixed(2)),
-          remainingDebt: parseFloat((debt - totalRepayment).toFixed(2)),
-        });
-
-        // Update income for the next year based on growth rate
-        currentIncome += currentIncome * (growth / 100);
-        years++;
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ error: errors.array()[0].msg });
       }
 
-      // Create a new user record with the calculated data
-      const user = new User({
-        debt,
-        income,
-        growth,
-        yearsToRepay: years, // Correctly define the field
+      const { debt, income, growth } = req.body;
+      
+      // Calculate repayment schedule
+      const repaymentSchedule = calculateRepaymentSchedule(debt, income, growth);
+      const yearsToRepay = repaymentSchedule.length;
+
+      res.json({
+        yearsToRepay,
+        repaymentSchedule
       });
-
-      // Save the user record to the database
-      await user.save();
-
-      console.log('Sending response:', { yearsToRepay: years, repaymentSchedule }); // Add this for debugging
-      res.json({ yearsToRepay: years, repaymentSchedule });
-    } catch (err) {
-      console.error('Calculation error:', err);
-      res.status(500).json({ error: 'Internal Server Error.' });
+    } catch (error) {
+      console.error('Calculation error:', error);
+      res.status(500).json({ error: 'Failed to process calculation' });
     }
   }
 );
+
+function calculateRepaymentSchedule(debt, income, growth) {
+  const schedule = [];
+  let remainingDebt = debt;
+  let currentIncome = income;
+  let year = 1;
+
+  while (remainingDebt > 0 && year <= 30) { // Cap at 30 years
+    const repaymentRate = getRepaymentRate(currentIncome);
+    const yearlyRepayment = currentIncome * repaymentRate;
+    
+    schedule.push({
+      year,
+      startingDebt: remainingDebt,
+      income: currentIncome,
+      repayment: yearlyRepayment,
+      remainingDebt: Math.max(0, remainingDebt - yearlyRepayment)
+    });
+
+    remainingDebt = Math.max(0, remainingDebt - yearlyRepayment);
+    currentIncome *= (1 + growth / 100);
+    year++;
+  }
+
+  return schedule;
+}
 
 /**
  * @route   POST /api/tax-calculation

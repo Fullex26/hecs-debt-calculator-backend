@@ -5,14 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tax Calculator - HECS Debt Calculator</title>
   
-  <!-- Add Inter font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="/styles.css">
-  <!-- Update Tax Calculator Script URL -->
-  <script src="https://www.ato.gov.au/Calculators-and-tools/Host/?calc=TaxCalculator" defer></script>
 </head>
 <body data-page="tax-calculator">
   <header>
@@ -32,17 +29,22 @@
       <h1>Tax Calculator</h1>
       <p class="subtitle">Calculate your tax and Medicare levy</p>
       
-      <!-- Add loading spinner -->
-      <div id="tax-spinner" class="spinner-container" hidden>
-        <div class="spinner"></div>
+      <!-- Replace with direct calculator embed -->
+      <div class="calculator-wrapper">
+        <iframe 
+          src="https://paycalculator.com.au/tax-calculator" 
+          width="100%" 
+          height="800" 
+          frameborder="0"
+          title="Tax Calculator"
+          loading="lazy"
+          allowfullscreen
+        ></iframe>
       </div>
-
-      <!-- Add calculator container -->
-      <div id="atataxcalculator" class="calculator-wrapper"></div>
 
       <!-- Add fallback message -->
       <div id="tax-fallback" class="error-message" hidden>
-        Unable to load the Tax Calculator at this time. Please try again later.
+        Unable to load the Tax Calculator. Please visit <a href="https://paycalculator.com.au/tax-calculator" target="_blank" rel="noopener">PayCalculator.com.au</a> directly.
       </div>
     </div>
   </main>
@@ -56,9 +58,6 @@
     </div>
   </footer>
 
-  <!-- Move scripts to end of body -->
   <script src="/script.js"></script>
-  <script src="/tax-calculator.js"></script>
-  <script src="/tax-widget-handler.js"></script>
 </body>
 </html>

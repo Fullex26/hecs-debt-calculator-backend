@@ -37,7 +37,7 @@ function initializeHecsDebtCalculator() {
     disableSubmitButton(true);
 
     try {
-      const data = await fetchData('/api/hecs/calculate', {
+      const data = await fetchData('/api/calculate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -283,6 +283,6 @@ async function fetchData(url, options) {
     return data;
   } catch (error) {
     console.error('API Error:', error);
-    throw new Error('Failed to process your request. Please try again.');
+    throw error;
   }
 }

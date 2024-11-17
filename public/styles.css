@@ -679,10 +679,19 @@ th, td {
 
 /* Calculator Wrapper */
 .calculator-wrapper {
+  width: 100%;
+  height: 800px;
   background: var(--card-background);
   border-radius: var(--radius-md);
-  padding: 2rem;
-  margin-top: 1.5rem;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.calculator-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: var(--radius-md);
 }
 
 /* Tax Calculator Specific Styles */
