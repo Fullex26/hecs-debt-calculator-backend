@@ -2,8 +2,9 @@
 
 document.addEventListener('DOMContentLoaded', function() {
   const currentPage = document.body.getAttribute('data-page');
+  console.log('Current page:', currentPage);
 
-  if (currentPage === 'hecs-debt-calculator') {
+  if (currentPage === 'hecs-calculator') {
     initializeHecsDebtCalculator();
   } else if (currentPage === 'tax-calculator') {
     initializeTaxCalculator();
@@ -21,55 +22,44 @@ function initializeHecsDebtCalculator() {
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
+    console.log('Form submitted');
 
-    // Clear previous errors and results
     clearError();
     clearAnalysis();
 
-    // Retrieve and parse input values
-    const debtInput = document.getElementById('debt');
-    const incomeInput = document.getElementById('income');
-    const growthInput = document.getElementById('growth');
+    const debt = parseFloat(document.getElementById('debt').value);
+    const income = parseFloat(document.getElementById('income').value);
+    const growth = parseFloat(document.getElementById('growth').value);
 
-    const debt = parseFloat(debtInput.value);
-    const income = parseFloat(incomeInput.value);
-    const growth = parseFloat(growthInput.value);
-
-    // Validate inputs
     const validationErrors = validateInputs(debt, income, growth);
     if (validationErrors.length > 0) {
       displayError(validationErrors.join(' '));
       return;
     }
 
-    // Show the spinner and disable the submit button
     showSpinner();
     disableSubmitButton(true);
 
     try {
-      // Send data to the backend API
-      const response = await fetch('/api/calculate', {
+      const data = await fetchData('/api/calculate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ debt, income, growth })
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'An unexpected error occurred.');
+      
+      console.log('Response data:', data);
+      
+      if (data.yearsToRepay && data.repaymentSchedule) {
+        displayResults(data.yearsToRepay, data.repaymentSchedule);
+      } else {
+        throw new Error('Invalid response format from server');
       }
-
-      const data = await response.json();
-      const { yearsToRepay, repaymentSchedule } = data;
-
-      // Generate and display results
-      displayResults(yearsToRepay, repaymentSchedule);
     } catch (error) {
+      console.error('Calculation error:', error);
       displayError(error.message);
     } finally {
-      // Hide the spinner and enable the submit button
       hideSpinner();
       disableSubmitButton(false);
     }
@@ -133,18 +123,38 @@ function initializeHecsDebtCalculator() {
    * @param {Array} repaymentSchedule - The repayment schedule data.
    */
   function displayResults(yearsToRepay, repaymentSchedule) {
+    console.log('Displaying results:', { yearsToRepay, repaymentSchedule });
+    
+    if (!yearsToRepay || !repaymentSchedule || !Array.isArray(repaymentSchedule)) {
+      console.error('Invalid data format for results');
+      displayError('Unable to display results due to invalid data format');
+      return;
+    }
+
     const message = generateMessage(yearsToRepay);
     const tableHTML = generateRepaymentTable(repaymentSchedule);
     const chartHTML = `<canvas id="repaymentChart" aria-label="Repayment Progress Chart" role="img"></canvas>`;
 
-    // Insert the results into the analysis div
-    analysisDiv.innerHTML = `<p>${message}</p>${tableHTML}${chartHTML}`;
+    analysisDiv.innerHTML = `
+      <div class="results-container">
+        <p class="results-message">${message}</p>
+        ${tableHTML}
+        ${chartHTML}
+      </div>
+    `;
+    
     analysisDiv.classList.add('show');
 
-    // Render the chart
-    renderChart(repaymentSchedule);
+    // Add a small delay before rendering the chart to ensure the canvas is ready
+    setTimeout(() => {
+      try {
+        renderChart(repaymentSchedule);
+      } catch (error) {
+        console.error('Chart rendering error:', error);
+        displayError('Unable to render the chart');
+      }
+    }, 100);
 
-    // Announce the results for screen readers
     analysisDiv.setAttribute('aria-live', 'polite');
   }
 

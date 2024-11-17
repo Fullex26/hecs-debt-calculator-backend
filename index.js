@@ -57,7 +57,8 @@ const scriptSrcUrls = [
 // Define allowed style sources
 const styleSrcUrls = [
   "'self'",
-  'https://cdnjs.cloudflare.com', // For external styles like Font Awesome
+  'https://cdnjs.cloudflare.com',
+  'https://calculatorsonline.com.au',
 ];
 
 // Define allowed font sources
@@ -77,6 +78,11 @@ app.use(
       imgSrc: ["'self'", 'data:', 'https://calculatorsonline.com.au'],
       connectSrc: ["'self'", 'https://calculatorsonline.com.au'],
       objectSrc: ["'none'"],
+      styleSrc: [
+        ...styleSrcUrls,
+        "'unsafe-inline'",
+        'https://calculatorsonline.com.au'
+      ],
     },
   })
 );
@@ -146,10 +152,11 @@ app.post(
       .toFloat(),
   ],
   async (req, res) => {
-    // Handle validation errors
+    console.log('Received calculation request:', req.body); // Add this for debugging
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      // Return the first validation error encountered
+      console.log('Validation errors:', errors.array()); // Add this for debugging
       return res.status(400).json({ error: errors.array()[0].msg });
     }
 
@@ -204,10 +211,10 @@ app.post(
       // Save the user record to the database
       await user.save();
 
-      // Respond with the calculation results
+      console.log('Sending response:', { yearsToRepay: years, repaymentSchedule }); // Add this for debugging
       res.json({ yearsToRepay: years, repaymentSchedule });
     } catch (err) {
-      console.error('Error in /api/calculate:', err);
+      console.error('Calculation error:', err);
       res.status(500).json({ error: 'Internal Server Error.' });
     }
   }
