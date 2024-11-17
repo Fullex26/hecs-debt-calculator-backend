@@ -49,8 +49,10 @@ const REPAYMENT_BANDS = [
 const scriptSrcUrls = [
   "'self'",
   "'unsafe-inline'",
-  "https://cdn.jsdelivr.net/npm/chart.js",
-  "https://calculatorsonline.com.au",
+  "'unsafe-eval'",
+  "https://cdn.jsdelivr.net/",
+  "https://www.ato.gov.au/",
+  "https://*.ato.gov.au"
 ];
 
 // Define allowed style sources
@@ -72,6 +74,13 @@ const connectSrcUrls = [
   "https://calculatorsonline.com.au",
 ];
 
+// Define allowed frame sources
+const frameSrcUrls = [
+  "'self'",
+  "https://www.ato.gov.au/",
+  "https://*.ato.gov.au"
+];
+
 // Configure Helmet's CSP
 app.use(
   helmet.contentSecurityPolicy({
@@ -82,7 +91,7 @@ app.use(
       connectSrc: connectSrcUrls,
       fontSrc: fontSrcUrls,
       imgSrc: ["'self'", "data:", "https:", "blob:"],
-      frameSrc: ["'self'", "https://calculatorsonline.com.au"],
+      frameSrc: frameSrcUrls
     },
   })
 );

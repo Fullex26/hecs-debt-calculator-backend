@@ -3,32 +3,29 @@ let messageHandler;
 document.addEventListener('DOMContentLoaded', function() {
   const spinner = document.getElementById('tax-spinner');
   const fallback = document.getElementById('tax-fallback');
-  const calculator = document.getElementById('atataxcalculator');
+  const container = document.getElementById('atataxcalculator');
 
-  // Show loading spinner
   if (spinner) spinner.hidden = false;
 
-  // Initialize tax calculator
-  if (window.ATATaxCalculator) {
-    try {
-      window.ATATaxCalculator.init({
-        container: 'atataxcalculator',
-        theme: 'light',
-        onLoad: function() {
-          if (spinner) spinner.hidden = true;
-        },
-        onError: function() {
-          if (spinner) spinner.hidden = true;
-          if (fallback) fallback.hidden = false;
-        }
-      });
-    } catch (error) {
-      console.error('Error initializing tax calculator:', error);
-      if (spinner) spinner.hidden = true;
-      if (fallback) fallback.hidden = false;
-    }
+  // Create iframe for ATO calculator
+  const iframe = document.createElement('iframe');
+  iframe.src = 'https://www.ato.gov.au/Calculators-and-tools/Host/?calc=TaxCalculator';
+  iframe.style.width = '100%';
+  iframe.style.height = '600px';
+  iframe.style.border = 'none';
+  iframe.onload = function() {
+    if (spinner) spinner.hidden = true;
+  };
+  iframe.onerror = function() {
+    if (spinner) spinner.hidden = true;
+    if (fallback) fallback.hidden = false;
+  };
+
+  // Add iframe to container
+  if (container) {
+    container.appendChild(iframe);
   } else {
-    console.error('Tax calculator script not loaded');
+    console.error('Calculator container not found');
     if (spinner) spinner.hidden = true;
     if (fallback) fallback.hidden = false;
   }

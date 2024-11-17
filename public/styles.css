@@ -687,12 +687,27 @@ th, td {
 
 /* Tax Calculator Specific Styles */
 #atataxcalculator {
-  min-height: 400px;
   width: 100%;
+  min-height: 600px;
   background: var(--card-background);
   border-radius: var(--radius-md);
-  padding: 1rem;
+  overflow: hidden;
   margin-top: 1rem;
+}
+
+#atataxcalculator iframe {
+  border: none;
+  border-radius: var(--radius-md);
+  background: var(--card-background);
+}
+
+.tax-calculator-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 600px;
+  background: var(--card-background);
+  border-radius: var(--radius-md);
 }
 
 .calculator-card {

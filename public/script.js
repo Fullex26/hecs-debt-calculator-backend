@@ -17,20 +17,18 @@ function initializeHecsDebtCalculator() {
 
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
-    console.log('Form submitted');
-
+    
     clearError();
     clearAnalysis();
 
-    // Get input values directly without regex replacement
-    const debt = parseFloat(document.getElementById('debt').value);
-    const income = parseFloat(document.getElementById('income').value);
-    const growth = parseFloat(document.getElementById('growth').value);
-
-    console.log('Input values:', { debt, income, growth }); // Debug log
+    const formData = {
+      debt: parseFloat(document.getElementById('debt').value),
+      income: parseFloat(document.getElementById('income').value),
+      growth: parseFloat(document.getElementById('growth').value)
+    };
 
     // Validate inputs
-    if (!isValidInput(debt) || !isValidInput(income) || !isValidGrowthRate(growth)) {
+    if (!isValidInput(formData.debt) || !isValidInput(formData.income) || !isValidGrowthRate(formData.growth)) {
       displayError('Please enter valid numbers. Debt and income must be positive, and growth rate must be between 0 and 100.');
       return;
     }
@@ -39,15 +37,13 @@ function initializeHecsDebtCalculator() {
     disableSubmitButton(true);
 
     try {
-      const data = await fetchData('/api/calculate', {
+      const data = await fetchData('/api/hecs/calculate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ debt, income, growth })
+        body: JSON.stringify(formData)
       });
-      
-      console.log('Response data:', data);
       
       if (data.yearsToRepay && data.repaymentSchedule) {
         displayResults(data.yearsToRepay, data.repaymentSchedule);
@@ -56,7 +52,7 @@ function initializeHecsDebtCalculator() {
       }
     } catch (error) {
       console.error('Calculation error:', error);
-      displayError(error.message);
+      displayError('Failed to calculate. Please check your inputs and try again.');
     } finally {
       hideSpinner();
       disableSubmitButton(false);
