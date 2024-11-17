@@ -50,6 +50,7 @@ const scriptSrcUrls = [
   'https://calculatorsonline.com.au',
   'https://cdn.jsdelivr.net', // For Chart.js
   'https://ajax.googleapis.com', // For jQuery
+  'https://calculatorsonline.com.au/tax_calculator/get_json_black_list'
 ];
 
 // Define allowed style sources
