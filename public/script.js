@@ -333,3 +333,20 @@ function initializeTaxCalculator() {
   // you can add event listeners or additional functionalities here.
   // For now, no additional scripts are required.
 }
+
+// Add better error handling for fetch requests
+async function fetchData(url, options) {
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'An unexpected error occurred');
+    }
+    
+    return data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw new Error('Failed to process your request. Please try again.');
+  }
+}

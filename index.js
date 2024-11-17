@@ -47,10 +47,10 @@ const REPAYMENT_BANDS = [
 // Define allowed script sources
 const scriptSrcUrls = [
   "'self'",
+  "'unsafe-inline'",
+  "'unsafe-eval'",
   'https://calculatorsonline.com.au',
-  'https://cdn.jsdelivr.net', // For Chart.js
-  'https://ajax.googleapis.com', // For jQuery
-  'https://calculatorsonline.com.au/tax_calculator/get_json_black_list'
+  'https://cdn.jsdelivr.net',
 ];
 
 // Define allowed style sources
@@ -71,12 +71,11 @@ app.use(
     directives: {
       defaultSrc: ["'self'"],
       scriptSrc: scriptSrcUrls,
-      styleSrc: styleSrcUrls,
+      styleSrc: [...styleSrcUrls, "'unsafe-inline'"],
       fontSrc: fontSrcUrls,
       imgSrc: ["'self'", 'data:', 'https://calculatorsonline.com.au'],
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'", 'https://calculatorsonline.com.au'],
       objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
     },
   })
 );
@@ -106,16 +105,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 mongoose.set('strictQuery', false);
 
 // Connect to MongoDB using the URI from environment variables
-mongoose
-  .connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1); // Exit the process if unable to connect to MongoDB
-  });
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  serverSelectionTimeoutMS: 5000,
+  socketTimeoutMS: 45000,
+  family: 4 // Force IPv4
+}).then(() => {
+  console.log('Connected to MongoDB');
+}).catch((err) => {
+  console.error('MongoDB connection error:', err);
+  process.exit(1);
+});
 
 // -----------------------------
 // API Endpoints
